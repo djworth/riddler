@@ -1,0 +1,22 @@
+{
+  "name": "drizzle-vue-box",
+  "version": "0.0.1",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": {
+    "name": "The Riddler",
+    "email": "riddler@riddlemethis.eth",
+    "url": "http://riddlemethis.eth"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "openzeppelin-solidity": "^2.1.1"
+  }
+}
