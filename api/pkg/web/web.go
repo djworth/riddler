@@ -23,7 +23,6 @@ func Serve(addr string) error {
 	e := echo.New()
 
 	e.GET("/:address", GetRiddle(conn))
-	e.PUT("/:address", AssignRiddle(conn))
 
 	return e.Start(addr)
 }

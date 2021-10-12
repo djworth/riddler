@@ -10,7 +10,7 @@ import (
 	"github.com/djworth/riddler/pkg/db/models"
 )
 
-func AssignRiddle(db *gorm.DB) echo.HandlerFunc {
+func GetRiddle(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		address := c.Param("address")
 
@@ -32,21 +32,6 @@ func AssignRiddle(db *gorm.DB) echo.HandlerFunc {
 		}
 		db.Create(&ar)
 
-		return c.JSON(http.StatusOK, ar.ToMap())
-	}
-}
-
-func GetRiddle(db *gorm.DB) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		address := c.Param("address")
-
-		ar := models.AssignedRiddle{}
-
-		results := db.Where("assigned_to = ?", address).Preload("Riddle").Take(&ar)
-
-		if results.RowsAffected == 0 {
-			return c.JSON(http.StatusOK, map[string]string{})
-		}
 		return c.JSON(http.StatusOK, ar.ToMap())
 	}
 }
