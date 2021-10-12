@@ -7,3 +7,6 @@ build: tidy
 
 run: tidy
 	go run cmd/api-server/main.go
+
+loaddb:
+	sqlite3 riddler.db -init scripts/load.sql
