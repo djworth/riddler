@@ -50,6 +50,13 @@ contract Riddler is ERC721URIStorage, Ownable {
     returns (uint256) {
         return Counters.current(riddleCounter);
     }
+
+    function hasRiddleBeenSolved(uint id)
+    public
+    view
+    returns (bool) {
+        return EnumerableMap.contains(riddlesSolvedBy, id);
+    }
     
     function solve(uint id, string memory answer) 
     payable 
@@ -73,9 +80,7 @@ contract Riddler is ERC721URIStorage, Ownable {
         
     }
     
-    
     function compareStrings(string memory a, string memory b) private pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
-    
 }
