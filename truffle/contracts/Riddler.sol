@@ -2,52 +2,70 @@
 
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract Riddler is ERC721URIStorage, Ownable {
+
+    using EnumerableMap for EnumerableMap.UintToAddressMap;
+    using Counters for Counters.Counter;
     
     struct Riddle {
+        uint id;
+        string tokenURI;
         string riddle;
         string answer;
     }
 
-    mapping(uint => address) public riddlesSolvedBy;
-    Riddle[] private riddles;
+    mapping(uint => Riddle) private riddles;
+    EnumerableMap.UintToAddressMap private riddlesSolvedBy;
+    Counters.Counter public riddleCounter;
 
     constructor() 
     ERC721("Riddler", "RDL") {}
-    
-    
-    function addRiddle(string memory riddle, string memory answer) 
+        
+    function addRiddle(uint id, string memory tokenURI, string memory riddle, string memory answer) 
     public 
     onlyOwner 
-    returns (uint){
-        Riddle memory r = Riddle(riddle, answer);
-        riddles.push(r);
+    returns (bool){
+        Riddle memory r = Riddle(id, tokenURI, riddle, answer);
+        riddles[id] = r;
+        Counters.increment(riddleCounter);
         
-        return riddles.length;
+        return true;
     }
     
     function getRiddle(uint index) 
     public
     view
-    returns (Riddle memory){
-        return riddles[index];
+    returns (string memory){
+        return riddles[index].riddle;
+    }
+
+    function numOfRiddles()
+    public
+    view
+    returns (uint256) {
+        return Counters.current(riddleCounter);
     }
     
-    function solve(uint idx, string memory answer, string memory tokenURI) 
+    function solve(uint id, string memory answer) 
+    payable 
     public
     returns (bool) {
         
-        Riddle memory riddle = getRiddle(idx);
+        require(EnumerableMap.contains(riddlesSolvedBy, id) == false, "Riddle has already been solved");
+
+        Riddle memory riddle = riddles[id];
         
         if (compareStrings(riddle.answer, answer)) {
             
-            _mint(msg.sender, idx);
-            _setTokenURI(idx, tokenURI);
+            _mint(msg.sender, id);
+            _setTokenURI(id, riddle.tokenURI);
             
-            riddlesSolvedBy[idx] = msg.sender;
+            EnumerableMap.set(riddlesSolvedBy, id, msg.sender);
             return true;
         }
         
