@@ -77,7 +77,6 @@ contract Riddler is ERC721URIStorage, Ownable {
         }
         
         return false;
-        
     }
     
     function compareStrings(string memory a, string memory b) private pure returns (bool) {
