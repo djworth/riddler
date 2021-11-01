@@ -10,8 +10,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 contract Riddler is ERC721URIStorage, Ownable {
 
     using EnumerableMap for EnumerableMap.UintToAddressMap;
+    using EnumerableSet for EnumerableSet.AddressSet;
     using Counters for Counters.Counter;
-    
+
     struct Riddle {
         uint id;
         string tokenURI;
@@ -20,16 +21,23 @@ contract Riddler is ERC721URIStorage, Ownable {
     }
 
     mapping(uint => Riddle) private riddles;
+
+    // Map of a Riddle.id to an address has has
     EnumerableMap.UintToAddressMap private riddlesSolvedBy;
+
+    // Set of addresses that have solved a riddle
+    EnumerableSet.AddressSet private riddlesSolvedBySet;
+
     Counters.Counter public riddleCounter;
 
     constructor() 
     ERC721("Riddler", "RDL") {}
-        
+
     function addRiddle(uint id, string memory tokenURI, string memory riddle, string memory answer) 
     public 
     onlyOwner 
-    returns (bool){
+    returns (bool) {
+
         Riddle memory r = Riddle(id, tokenURI, riddle, answer);
         riddles[id] = r;
         Counters.increment(riddleCounter);
@@ -57,22 +65,35 @@ contract Riddler is ERC721URIStorage, Ownable {
     returns (bool) {
         return EnumerableMap.contains(riddlesSolvedBy, id);
     }
+
+    function hasAddressSolvedARiddle()
+    public
+    view
+    returns (bool) {
+        return EnumerableSet.contains(riddlesSolvedBySet, msg.sender);
+    }
+    
     
     function solve(uint id, string memory answer) 
     payable 
     public
     returns (bool) {
         
+        require(EnumerableSet.contains(riddlesSolvedBySet, msg.sender) == false, "Address has already solved a riddle");
         require(EnumerableMap.contains(riddlesSolvedBy, id) == false, "Riddle has already been solved");
+       
+        // Verify the amount of ETH being sent
 
         Riddle memory riddle = riddles[id];
-        
+ 
         if (compareStrings(riddle.answer, answer)) {
             
             _mint(msg.sender, id);
             _setTokenURI(id, riddle.tokenURI);
             
             EnumerableMap.set(riddlesSolvedBy, id, msg.sender);
+            EnumerableSet.add(riddlesSolvedBySet, msg.sender);
+
             return true;
         }
         

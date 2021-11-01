@@ -35,3 +35,15 @@ func GetRiddle(db *gorm.DB) echo.HandlerFunc {
 		return c.JSON(http.StatusOK, ar.ToMap())
 	}
 }
+
+func ValidAnswer(db *gorm.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return nil
+	}
+}
+
+func HashAnswer(db *gorm.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return nil
+	}
+}
