@@ -14,6 +14,14 @@ import (
 	"github.com/djworth/riddler/pkg/hash"
 )
 
+type HashAnswerRequest struct {
+	Answer string `json:"answer"`
+}
+
+type HashAnswerResponse struct {
+	Hashed string `json:"hashed"`
+}
+
 type ValidateAnswerRequest struct {
 	RiddleID      int    `json:"id"`
 	WalletAddress string `json:"address"`
@@ -79,7 +87,7 @@ func ValidateAnswer(db *gorm.DB) echo.HandlerFunc {
 		}
 
 		assignedRiddle := models.AssignedRiddle{}
-		results := db.Where("assigned_to = ?", req.Answer, "riddle_id = ?", req.RiddleID).Preload("Riddle").Take(&assignedRiddle)
+		results := db.Where("assigned_to = ?").Where(req.WalletAddress, "riddle_id = ?", req.RiddleID).Preload("Riddle").Take(&assignedRiddle)
 		if results.RowsAffected != 1 {
 			return c.JSON(http.StatusBadRequest, errors.New("unable to find riddle for addressed"))
 		}
@@ -95,15 +103,15 @@ func ValidateAnswer(db *gorm.DB) echo.HandlerFunc {
 
 func HashAnswer(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		data := map[string]string{}
+		data := HashAnswerRequest{}
 
 		err := c.Bind(&data)
 		if err != nil {
 			return err
 		}
 
-		results := map[string]string{}
-		results["hashed"] = hash.Hash(strings.ToLower(data["answer"]))
+		results := &HashAnswerResponse{}
+		results.Hashed = hash.Hash(strings.ToLower(data.Answer))
 
 		return c.JSON(http.StatusOK, results)
 	}

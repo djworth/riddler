@@ -11,5 +11,5 @@ func Connect() (*gorm.DB, error) {
 }
 
 func AutoMigrate(db *gorm.DB) error {
-	return db.AutoMigrate(&models.Riddle{}, &models.AssignedRiddle{})
+	return db.AutoMigrate(&models.Riddle{}, &models.AssignedRiddle{}, &models.ValidateAnswers{})
 }
