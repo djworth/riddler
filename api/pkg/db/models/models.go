@@ -10,9 +10,9 @@ type Riddle struct {
 	ID        int            `json:"id" gorm:"type:int;primaryKey;autoIncrement:true"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"update_at"`
-	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index";`
+	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 	Riddle    string         `json:"riddle"`
-	Solution  string         `json:"-"`
+	Answer    string         `json:"-"`
 }
 
 type AssignedRiddle struct {
@@ -21,6 +21,13 @@ type AssignedRiddle struct {
 	Riddle     Riddle    `json:"riddle" gorm:"foreignKey:RiddleID;references:ID"`
 	RiddleID   int       `json:"-" gorm:"type:int;primaryKey"`
 	AssignedTo string    `json:"assigned_to" gorm:"type:text;primaryKey"`
+}
+
+type ValidateAnswers struct {
+	CreatedAt  time.Time `json:"created_at"`
+	RiddleID   int       `json:"-" gorm:"foreignKey:RiddleID;references:ID"`
+	AssignedTo string    `json:"assigned_to" gorm:"type:text;primaryKey"`
+	Answer     string    `json:"answer" gorm:"type:text"`
 }
 
 func (r *Riddle) ToMap() map[string]interface{} {
